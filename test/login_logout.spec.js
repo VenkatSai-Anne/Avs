@@ -1,6 +1,6 @@
 import { test } from "@playwright/test";
 import credentials from "./credentials";
-import { performLogin, logout } from "./login&logout";
+import { performLogin, performLogout } from "./login&logout";
 
 test("login & logout", async ({ page }) => {
   // Login with incorrect credentials
