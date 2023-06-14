@@ -3,8 +3,8 @@ export default {
     password: "bw",
     email1: "bw",
     password1: "brucew@team-eagle.ca",
-    loginURL: "https://eisglobal.app/auth/login",
-    homeURL: "https://eisglobal.app",
+    loginURL: "https://qa.eisglobal.app/auth/login",
+    homeURL: "https://qa.eisglobal.app",
     title: "EIS",
 };
   
