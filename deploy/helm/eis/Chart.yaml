@@ -1,0 +1,37 @@
+apiVersion: v2
+appVersion: v1.0.0
+dependencies:
+# Application dependencies
+- name: postgresql
+  version: "12.5.6"
+  repository: file://charts/postgresql
+
+- name: eis-backend
+  repository: "file://charts/eis-backend"
+  version: 1.0.0
+
+- name: eis-frontend
+  repository: "file://charts/eis-frontend"
+  version: 1.0.0
+
+# Monitoring dependencies
+- name: kube-prometheus-stack
+  version: "46.8.0"
+  repository: file://charts/kube-prometheus-stack
+  condition: monitoring.enabled
+
+# On Premise LoadBalancer
+- name: metallb
+  version: "4.5.3"
+  repository: file://charts/metallb
+  condition: metallb.enabled
+
+description: EIS Helm Chart for K8S
+home: https://eisglobal.app
+
+maintainers:
+- email: partha.konda@buildbot.tech
+  name: Partha Konda
+name: eis
+type: application
+version: 1.0.0

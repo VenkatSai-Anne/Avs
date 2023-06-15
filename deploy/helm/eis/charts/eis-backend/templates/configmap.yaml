@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: {{ .Release.Namespace }}
+  name: {{ include "backend.fullname" . }}-config
+data:
+  TYPEORM_CONNECTION: postgres
+  {{ if .Values.env.TYPEORM_HOST -}}
+  TYPEORM_HOST: {{ .Values.env.TYPEORM_HOST | quote -}}
+  {{- else -}}
+  TYPEORM_HOST: "{{ .Release.Name }}-postgresql.{{ .Release.Namespace }}.svc.cluster.local"
+  {{ end -}}
+  TYPEORM_PORT: {{ .Values.env.TYPEORM_PORT | quote }}
+  TYPEORM_USERNAME: {{ .Values.env.TYPEORM_USERNAME | quote }}
+  TYPEORM_PASSWORD: {{ .Values.env.TYPEORM_PASSWORD | quote }}
+  TYPEORM_DATABASE: {{ .Values.env.TYPEORM_DATABASE | quote }}
+  TYPEORM_SYNCHRONIZE: {{ .Values.env.TYPEORM_SYNCHRONIZE | quote }}
+  TYPEORM_LOGGING: "true"
+  TYPEORM_ENTITIES: "src/**/entity/*.ts"
+  PORT: {{ .Values.env.PORT | quote }}
+  SECRET_KEY: {{ .Values.env.SECRET_KEY | quote }}
+  LOG_FORMAT: dev
+  JWT_TOKEN: qazxsw2!QAZXSW@<yS<BF%Jxa4L3bt2w`%T'VYn_SxP9e?
+  TOKEN_EXPIRY_DAYS: {{ .Values.env.TOKEN_EXPIRY_DAYS | quote }}
+  SOURCE_EMAIL_ADDRESS: {{ .Values.env.SOURCE_EMAIL_ADDRESS | quote }}
+  EMAIL_SERVER_NAME: {{ .Values.env.EMAIL_SERVER_NAME | quote }}
+  EMAIL_SERVER_PORT: {{ .Values.env.EMAIL_SERVER_PORT | quote }}
+  EMAIL_USER_NAME: {{ .Values.env.EMAIL_USER_NAME | quote }}
+  EMAIL_PASSWORD: {{ .Values.env.EMAIL_PASSWORD | quote }}
+  NAV_TEST_SERVER: {{ .Values.env.NAV_TEST_SERVER | quote }}
+  NAV_PRODUCTION_SERVER: {{ .Values.env.NAV_PRODUCTION_SERVER | quote }}
+  NAV_TEST_SERVER_USERNAME: {{ .Values.env.NAV_TEST_SERVER_USERNAME | quote }}
+  NAV_TEST_SERVER_PASSWORD: {{ .Values.env.NAV_TEST_SERVER_PASSWORD | quote }}

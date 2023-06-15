@@ -1,0 +1,18 @@
+dependencies:
+- name: postgresql
+  repository: https://charts.bitnami.com/bitnami
+  version: 12.5.6
+- name: backend
+  repository: file://charts/backend
+  version: 1.0.0
+- name: frontend
+  repository: file://charts/frontend
+  version: 1.0.0
+- name: kube-prometheus-stack
+  repository: file://charts/kube-prometheus-stack
+  version: 46.8.0
+- name: metallb
+  repository: file://charts/metallb
+  version: 4.5.3
+digest: sha256:a4e81029e967d7ae7fedfe4d53a856975ad8ca4a40bbfcbdd3b3ff118d7f901f
+generated: "2023-06-12T12:04:21.689033+05:30"

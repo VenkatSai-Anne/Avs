@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: eis
+  name: eis-postgres-config
+  labels:
+    app: postgres
+data:
+  POSTGRES_DB: eis
+  POSTGRES_USER: eis
+  POSTGRES_PASSWORD: eis # TODO: change it to secret

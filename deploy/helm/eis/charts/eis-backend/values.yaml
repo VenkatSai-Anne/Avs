@@ -1,0 +1,36 @@
+# Image
+image:
+  repository: ""
+  tag: ""
+  pullPolicy: "Always"
+  pullSecretName: ""
+
+# Service
+service:
+  port: 80
+  targetPort: 3000
+  type: ClusterIP
+
+# Scaling
+replicaCount: 1
+
+# Application Environment Variables
+env:
+  TYPEORM_HOST: ""
+  TYPEORM_PORT: ""
+  TYPEORM_USERNAME: ""
+  TYPEORM_PASSWORD: ""
+  TYPEORM_DATABASE: ""
+  TYPEORM_SYNCHRONIZE: ""
+  PORT: ""
+  SECRET_KEY: ""
+  TOKEN_EXPIRY_DAYS: ""
+  SOURCE_EMAIL_ADDRESS: ""
+  EMAIL_SERVER_NAME: ""
+  EMAIL_SERVER_PORT: ""
+  EMAIL_USER_NAME: ""
+  EMAIL_PASSWORD: ""
+  NAV_TEST_SERVER: ""
+  NAV_PRODUCTION_SERVER: ""
+  NAV_TEST_SERVER_USERNAME: ""
+  NAV_TEST_SERVER_PASSWORD: ""

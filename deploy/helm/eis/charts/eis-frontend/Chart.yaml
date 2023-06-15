@@ -1,0 +1,9 @@
+apiVersion: v2
+name: eis-frontend
+description: A Helm chart for EIS Frontend
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+maintainers:
+  - name: "Partha Konda"
+    email: "partha.konda@buildbot.tech"

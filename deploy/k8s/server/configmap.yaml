@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: eis
+  name: eis-server-configmap
+data:
+  TYPEORM_CONNECTION: postgres
+  TYPEORM_HOST: eis-postgres-dev-postgresql
+  TYPEORM_PORT: "5432"
+  TYPEORM_USERNAME: postgres
+  TYPEORM_PASSWORD: eis
+  TYPEORM_DATABASE: eis
+  TYPEORM_SYNCHRONIZE: "true"
+  TYPEORM_LOGGING: "true"
+  TYPEORM_ENTITIES: "src/**/entity/*.ts"
+  PORT: "3000"
+  SECRET_KEY: secretKey
+  LOG_FORMAT: dev
+  JWT_TOKEN: qazxsw2!QAZXSW@<yS<BF%Jxa4L3bt2w`%T'VYn_SxP9e?{
+  TOKEN_EXPIRY_DAYS: "1"
+  SOURCE_EMAIL_ADDRESS: notifications@team-eagle.ca
+  EMAIL_SERVER_NAME: smtp.office365.com
+  EMAIL_SERVER_PORT: "587"
+  EMAIL_USER_NAME: notifications@team-eagle.ca
+  EMAIL_PASSWORD: hhtbcpwdkfvmfwjf
+  EIS_USER_TYPE_PASSWORD: bw
+  NAV_TEST_SERVER: https://rsctest.navcanada.ca/rsc/rscservice.asmx
+  NAV_PRODUCTION_SERVER: https://nes.navcanada.ca/RSCService.asmx
+  NAV_TEST_SERVER_USERNAME: vendor_Eagle
+  NAV_TEST_SERVER_PASSWORD: 4rfv$RFV
+  EIS_USER_TYPE_PASSWORD: bw
+  synchronize: "false"

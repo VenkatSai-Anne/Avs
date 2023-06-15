@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: eis
+  name: eis-server-deployment
+  labels:
+    app: eis-server
+    module: eis-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: eis-server
+  template:
+    metadata:
+      labels:
+        app: eis-server
+    spec:
+      imagePullSecrets:
+        - name: acrsecret 
+      containers:
+        - name: eis-server
+          image: eisapps.azurecr.io/eisbackend:9ebc61a9ef6763201a7b4386643245a6e66d6a98
+          imagePullPolicy: Always
+          
+          ports:
+            - containerPort: 3000
+          envFrom:
+          - configMapRef:
+              name: eis-server-configmap

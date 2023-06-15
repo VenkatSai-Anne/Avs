@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: eis
+  name: eis-client
+  labels:
+    app: eis-client
+    module: eis-client
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: eis-client
+  template:
+    metadata:
+      labels:
+        app: eis-client
+    spec:
+      imagePullSecrets:
+        - name: acrsecret 
+      containers:
+        - name: eis-client
+          image: eisapps.azurecr.io/eisfrontend:9ebc61a9ef6763201a7b4386643245a6e66d6a98
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
