@@ -1,0 +1,30 @@
+---
+- name: Create secret for ACR in Kubernetes cluster
+  hosts: localhost
+  gather_facts: false
+  vars:
+    tenant_id: "406a2a33-7202-4bc5-adff-234a0a445457"
+    subscription_id: "d6389ac0-7ed9-4150-8282-9a7cb554e4bd"
+    client_id: "e0b1a8ac-d80a-4ada-ba91-3605dde8b9aa"
+    client_secret: "Eoj8Q~SPzYENF695jS7585H-oJrUsregWEFNTddf"
+    acr_name: "eisapps.azurecr.io"
+    secret_name: "acrsecret1"
+
+  tasks:
+    - name: Set Azure subscription
+      shell: az account set --subscription "{{ subscription_id }}"
+
+    - name: Get ACR login server
+      shell: az acr show --name "{{ acr_name }}" --query loginServer --output tsv
+      register: acr_login_server
+
+    - name: Get ACR credentials
+      shell: az acr credential show --name "{{ acr_name }}" --query "passwords[0].value" --output tsv
+      register: acr_credentials
+
+    - name: Create Kubernetes secret
+      shell: |
+        kubectl create secret docker-registry "{{ secret_name }}" \
+        --docker-server="{{ acr_login_server.stdout }}" \
+        --docker-username="{{ acr_login_server.stdout }}" \
+        --docker-password="{{ acr_credentials.stdout }}"
