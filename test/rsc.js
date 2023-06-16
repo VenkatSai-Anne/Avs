@@ -71,25 +71,42 @@ export async function validTo(page) {
   await page.getByRole("option", { name: "Match NOTAM End Time" }).click();
 }
 
-export async function snowbankBesideRunway(page) {
-    // Check Snowbanks Beside Runway
-  await page.getByRole("button", { name: "Snowbanks Beside Runway" }).click();
-  await page.getByLabel('Snowbank Adjacent To Runway NORTH').click();
-  await page.getByLabel('Snowbank Is Along Runway Edge').first().click();
-  await page.getByLabel('Set Distance From Runway Edge').first().click();
-  await page.getByLabel('Distance FT').first().fill("a");
-  expect(await page.isVisible('label:has-text("Distance From Runway Edge - NORTH - Must Be A Valid Number Between 0 and 14000")'));
-  await page.getByLabel('Distance FT').first().fill("2");
-  await page.getByLabel('Snowbank Adjacent To Runway SOUTH').click();
-  await page.getByLabel('Snowbank Is Along Runway Edge').first().click();
-  await page.getByLabel('Set Distance From Runway Edge').first().click();
-  await page.getByLabel('Distance FT').first().fill("a");
-  expect(await page.isVisible('label:has-text("Distance From Runway Edge - NORTH - Must Be A Valid Number Between 0 and 14000")'));
-  await page.getByLabel('Distance FT').first().fill("2");
-  expect(await page.isVisible('label:has-text("Snowbank Maximum Height Has Not Been Set")'));
-  await page.getByLabel('FT', { exact: true }).click("2");
-  await page.getByLabel('IN', { exact: true }).click("2");
+export async function fillMaxHeight(page, heightIN, heightFT) {
+  await page.getByLabel('FT', { exact: true }).click(heightFT);
+  await page.getByLabel('IN', { exact: true }).click(heightIN);
 }
+
+export async function checkRadioButtons(page) {
+  await page.getByLabel('Snowbank Is Along Runway Edge').first().click();
+  await page.getByLabel('Set Distance From Runway Edge').first().click();
+}
+
+export async function fillDistanceFT(page, distance) {
+  await page.getByLabel('Distance FT').first().fill(distance);
+}
+
+export async function handleSnowbankDirection(page, direction, distance) {
+  await page.getByLabel(`Snowbank Adjacent To Runway ${direction}`).click();
+  await checkRadioButtons(page);
+  await fillDistanceFT(page, distance);
+}
+
+export async function snowbankBesideRunway(page) {
+
+  const directions = ["NORTHEAST", "SOUTHWEST"];
+
+  for (const direction of directions) {
+    await handleSnowbankDirection(page, direction, "a");
+    // Assert the visibility of the validation message if required
+    await fillDistanceFT(page, "2");
+  }
+
+  // Assert the visibility of the snowbank maximum height message if required
+  expect(await page.isVisible('label:has-text("Snowbank Maximum Height Has Not Been Set")'));
+
+  await fillMaxHeight(page, "2", "2");
+}
+
 
 export async function timeChange(page) {
 
@@ -189,373 +206,272 @@ export async function otherLocalizedConditions(page) {
   // await page.getByRole('button', { name: 'Yes' }).click();
 }
 
-export async function conditionsOnRunway(page) {
-  
-  await page.getByRole('button', { name: 'Add Snowbank' }).first().click();
-  await page.getByRole('button', { name: 'Cancel' }).click();
-  await page.getByRole('button', { name: 'Add Snowbank' }).first().click();
-  await page.getByRole('button', { name: 'Along Cleared Width' }).click();
-  await page.getByRole('option', { name: 'Along Cleared Width' }).click();
-  await page.getByLabel('FT', { exact: true }).fill("2");
-  await page.getByLabel('IN', { exact: true }).fill("2");
-  await page.getByRole('button', { name: 'Add' }).click();
-  await page.getByRole('row', { name: 'Along Cleared Width 2 FT 2 IN' }).getByRole('rowheader', { name: 'Along Cleared Width' }).click();
-  await page.getByRole('button', { name: 'Edit Snowbank' }).first().click();
-  await page.getByRole('button', { name: 'Cancel' }).click();
-  await page.getByRole('row', { name: 'Along Cleared Width 2 FT 2 IN' }).getByRole('rowheader', { name: 'Along Cleared Width' }).click();
-  await page.getByRole('button', { name: 'edit Snowbank' }).first().click();
-  await page.getByLabel('FT', { exact: true }).fill("3");
-  await page.getByLabel('IN', { exact: true }).fill("3");
-  await page.getByRole('button', { name: 'Ok' }).click();
-  await page.getByRole('row', { name: 'Along Cleared Width 3 FT 3 IN' }).getByRole('rowheader', { name: 'Along Cleared Width' }).click();
-  await page.getByRole('button', { name: 'Delete Snowbank'}).first().click();
-  await page.getByRole('button', { name: 'No' }).click();
-  await page.getByRole('row', { name: 'Along Cleared Width 3 FT 3 IN' }).getByRole('rowheader', { name: 'Along Cleared Width' }).click();
-  await page.getByRole('button', { name: 'Delete Snowbank'}).first().click();
-  await page.getByRole('button', { name: 'Yes' }).click();
-  await page.getByRole('button', { name: 'Add Snowbank' }).first().click();
-  await page.getByRole('button', { name: 'Along Cleared Width' }).click();
-  await page.getByRole('option', { name: 'Along Inside Runway Edge' }).click();
-  await page.getByLabel('FT', { exact: true }).fill("2");
-  await page.getByLabel('IN', { exact: true }).fill("2");
-  await page.getByLabel('NORTH side').click();
-  await page.getByRole('button', { name: '​' }).nth(1).click();
-  await page.getByRole('option', { name: '30' }).click();
-  await page.getByLabel('SOUTH side').click();
-  await page.getByRole('button', { name: '​' }).nth(2).click();
-  await page.getByRole('option', { name: '30' }).click();
-  await page.getByRole('button', { name: 'Add' }).click();
-  await page.getByRole('row', { name: 'Along Inside Runway Edge - 30 FT to the NORTH 2 FT 2 IN' }).getByRole('rowheader', { name: 'Along Inside Runway Edge - 30 FT to the NORTH' }).click();
-  await page.getByRole('button', { name: 'Edit Snowbank' }).first().click();
-  await page.getByRole('button', { name: 'Cancel' }).click();
-  // await page.getByRole('row', { name: 'Along Inside Runway Edge - 30 FT to the NORTH 2 FT 2 IN' }).getByRole('rowheader', { name: 'Along Inside Runway Edge - 30 FT to the NORTH' }).click();
-  await page.getByRole('button', { name: 'Edit Snowbank' }).first().click();
-  await page.getByLabel('FT', { exact: true }).click("3");
-  await page.getByLabel('IN', { exact: true }).click("3");
-  await page.getByRole('button', { name: 'Ok' }).click();
-  // await page.getByRole('row', { name: 'Along Inside Runway Edge - 30 FT to the NORTH 3 FT 3 IN' }).getByRole('rowheader', { name: 'Along Inside Runway Edge - 30 FT to the NORTH' }).click();
-  await page.getByRole('button', { name: 'Delete Snowbank'}).first().click();
-  await page.getByRole('button', { name: 'No' }).click();
-  // await page.getByRole('row', { name: 'Along Inside Runway Edge - 30 FT to the NORTH 2 FT 2 IN' }).getByRole('rowheader', { name: 'Along Inside Runway Edge - 30 FT to the NORTH' }).click();
-  await page.getByRole('button', { name: 'Delete Snowbank'}).first().click();
-  await page.getByRole('button', { name: 'Yes' }).click();
-  await page.getByRole('button', { name: 'Add Snowbank' }).first().click();
-  await page.getByRole('button', { name: 'Along Cleared Width' }).click();
-  await page.getByRole('option', { name: 'Distance From Center Line' }).click();
-  await page.getByLabel('FT', { exact: true }).fill("2");
-  await page.getByLabel('IN', { exact: true }).fill("2");
-  await page.getByLabel('NORTH side').click();
-  await page.getByRole('button', { name: '​' }).nth(1).click();
-  await page.getByRole('option', { name: '30' }).click();
-  await page.getByLabel('SOUTH side').click();
-  await page.getByRole('button', { name: '​' }).nth(2).click();
-  await page.getByRole('option', { name: '30' }).click();
-  await page.getByRole('button', { name: 'Add' }).click();
-  await page.getByRole('row', { name: 'Distance From Center Line - 30 FT to the SOUTH 2 FT 2 IN' }).getByRole('rowheader', { name: 'Distance From Center Line - 30 FT to the SOUTH' }).click();
-  await page.getByRole('button', { name: 'Edit Snowbank' }).first().click();
-  await page.getByRole('button', { name: 'Cancel' }).click();
-  // await page.getByRole('row', { name: 'Distance From Center Line - 30 FT to the SOUTH 2 FT 2 IN' }).getByRole('rowheader', { name: 'Distance From Center Line - 30 FT to the SOUTH' }).click();
-  await page.getByRole('button', { name: 'Edit Snowbank' }).first().click();
-  await page.getByLabel('FT', { exact: true }).click("3");
-  await page.getByLabel('IN', { exact: true }).click("3");
-  await page.getByRole('button', { name: 'Ok' }).click();
-  // await page.getByRole('row', { name: 'Distance From Center Line - 30 FT to the SOUTH 3 FT 3 IN' }).getByRole('rowheader', { name: 'Distance From Center Line - 30 FT to the SOUTH' }).click();
-  await page.getByRole('button', { name: 'Delete Snowbank'}).first().click();
-  await page.getByRole('button', { name: 'No' }).click();
-  // await page.getByRole('row', { name: 'Distance From Center Line - 30 FT to the SOUTH 2 FT 2 IN' }).getByRole('rowheader', { name: 'Distance From Center Line - 30 FT to the SOUTH' }).click();
-  await page.getByRole('button', { name: 'Delete Snowbank'}).first().click();
-  await page.getByRole('button', { name: 'Yes' }).click();
-  await page.getByRole('button', { name: 'Add Snowbank' }).first().click();
-  await page.getByRole('button', { name: 'Along Cleared Width' }).click();
-  await page.getByRole('option', { name: 'Distance From Threshold' }).click();
-  await page.getByLabel('FT', { exact: true }).fill("2");
-  await page.getByLabel('IN', { exact: true }).fill("2");
-  await page.getByRole('button', { name: '​' }).nth(1).click();
-  await page.getByRole('option').nth(1).click();
-  await page.getByRole('button', { name: '​' }).nth(2).click();
-  await page.getByRole('option', { name: '700', exact: true }).click();
-  await page.getByRole('button', { name: 'Add' }).click();
-  await page.getByRole('rowheader', { name: 'Distance From Threshold - 700 FT from 25' }).click();
-  await page.getByRole('button', { name: 'Edit Snowbank' }).first().click();
-  await page.getByRole('button', { name: 'Cancel' }).click();
-  // await page.getByRole('rowheader', { name: 'Distance From Threshold - 700 FT from 25' }).click();
-  await page.getByRole('button', { name: 'Edit Snowbank' }).first().click();
-  await page.getByLabel('FT', { exact: true }).click("3");
-  await page.getByLabel('IN', { exact: true }).click("3");
-  await page.getByRole('button', { name: 'Ok' }).click();
-  // await page.getByRole('rowheader', { name: 'Distance From Threshold - 700 FT from 25' }).click();
-  await page.getByRole('button', { name: 'Delete Snowbank'}).first().click();
-  await page.getByRole('button', { name: 'No' }).click();
-  // await page.getByRole('rowheader', { name: 'Distance From Threshold - 700 FT from 25' }).click();
-  await page.getByRole('button', { name: 'Delete Snowbank'}).first().click();
-  await page.getByRole('button', { name: 'Yes' }).click();
-  await page.getByRole('button', { name: 'Add Snowbank' }).first().click();
-  await page.getByRole('button', { name: 'Along Cleared Width' }).click();
-  await page.getByRole('option', { name: 'Across Intersection From Runway' }).click();
-  await page.getByLabel('FT', { exact: true }).fill("2");
-  await page.getByLabel('IN', { exact: true }).fill("2");
-  await page.getByRole('button', { name: '​' }).nth(1).click();
-  await page.getByRole('option').nth(1).click();
-  await page.getByRole('button', { name: 'Add' }).click();
-  await page.getByRole('rowheader', { name: 'Across Intersection From Runway: 14/32' }).click();
-  await page.getByRole('button', { name: 'Edit Snowbank' }).first().click();
-  await page.getByRole('button', { name: 'Cancel' }).click();
-  // await page.getByRole('rowheader', { name: 'Across Intersection From Runway: 14/32' }).click();
-  await page.getByRole('button', { name: 'Edit Snowbank' }).first().click();
-  await page.getByLabel('FT', { exact: true }).click("3");
-  await page.getByLabel('IN', { exact: true }).click("3");
-  await page.getByRole('button', { name: 'Ok' }).click();
-  // await page.getByRole('rowheader', { name: 'Across Intersection From Runway: 04/22' }).click();
-  await page.getByRole('button', { name: 'Delete Snowbank'}).first().click();
-  await page.getByRole('button', { name: 'No' }).click();
-  // await page.getByRole('rowheader', { name: 'Across Intersection From Runway: 04/22' }).click();
-  await page.getByRole('button', { name: 'Delete Snowbank'}).first().click();
-  await page.getByRole('button', { name: 'Yes' }).click();
-  // await page.getByRole('tab', { name: 'Windrows' }).click();
-  // await page.getByRole('button', { name: 'Add Windrows' }).first().click();
-  // await page.getByRole('button', { name: 'Cancel' }).click();
-  // await page.getByRole('button', { name: 'Add Windrows' }).first().click();
-  // await page.getByRole('button', { name: 'Along Cleared Width' }).click();
-  // await page.getByRole('option', { name: 'Along Cleared Width' }).click();
-  // await page.getByLabel('FT', { exact: true }).fill("2");
-  // await page.getByLabel('IN', { exact: true }).fill("2");
-  // await page.getByRole('button', { name: 'Add' }).click();
-  // await page.getByRole('row', { name: 'Along Cleared Width 2 FT 2 IN' }).getByRole('rowheader', { name: 'Along Cleared Width' }).click();
-  // await page.getByRole('button', { name: 'Edit Windrows' }).first().click();
-  // await page.getByRole('button', { name: 'Cancel' }).click();
-  // await page.getByRole('row', { name: 'Along Cleared Width 2 FT 2 IN' }).getByRole('rowheader', { name: 'Along Cleared Width' }).click();
-  // await page.getByRole('button', { name: 'Edit Windrows' }).first().click();
-  // await page.getByLabel('FT', { exact: true }).fill("3");
-  // await page.getByLabel('IN', { exact: true }).fill("3");
-  // await page.getByRole('button', { name: 'Ok' }).click();
-  // await page.getByRole('row', { name: 'Along Cleared Width 3 FT 3 IN' }).getByRole('rowheader', { name: 'Along Cleared Width' }).click();
-  // await page.getByRole('button', { name: 'Delete Windrows'}).first().click();
-  // await page.getByRole('button', { name: 'No' }).click();
-  // await page.getByRole('row', { name: 'Along Cleared Width 3 FT 3 IN' }).getByRole('rowheader', { name: 'Along Cleared Width' }).click();
-  // await page.getByRole('button', { name: 'Delete Windrows'}).first().click();
-  // await page.getByRole('button', { name: 'Yes' }).click();
-  // await page.getByRole('button', { name: 'Add Windrows' }).first().click();
-  // await page.getByRole('button', { name: 'Along Cleared Width' }).click();
-  // await page.getByRole('option', { name: 'Along Inside Runway Edge' }).click();
-  // await page.getByLabel('FT', { exact: true }).fill("2");
-  // await page.getByLabel('IN', { exact: true }).fill("2");
-  // await page.getByLabel('NORTH side').click();
-  // await page.getByRole('button', { name: '​' }).nth(1).click();
-  // await page.getByRole('option', { name: '30' }).click();
-  // await page.getByLabel('SOUTH side').click();
-  // await page.getByRole('button', { name: '​' }).nth(2).click();
-  // await page.getByRole('option', { name: '30' }).click();
-  // await page.getByRole('button', { name: 'Add' }).click();
-  // await page.getByRole('row', { name: 'Along Inside Runway Edge - 30 FT to the NORTH 2 FT 2 IN' }).getByRole('rowheader', { name: 'Along Inside Runway Edge - 30 FT to the NORTH' }).click();
-  // await page.getByRole('button', { name: 'Edit Windrows' }).first().click();
-  // await page.getByRole('button', { name: 'Cancel' }).click();
-  // // await page.getByRole('row', { name: 'Along Inside Runway Edge - 30 FT to the NORTH 2 FT 2 IN' }).getByRole('rowheader', { name: 'Along Inside Runway Edge - 30 FT to the NORTH' }).click();
-  // await page.getByRole('button', { name: 'Edit Windrows' }).first().click();
-  // await page.getByLabel('FT', { exact: true }).click("3");
-  // await page.getByLabel('IN', { exact: true }).click("3");
-  // await page.getByRole('button', { name: 'Ok' }).click();
-  // // await page.getByRole('row', { name: 'Along Inside Runway Edge - 30 FT to the NORTH 3 FT 3 IN' }).getByRole('rowheader', { name: 'Along Inside Runway Edge - 30 FT to the NORTH' }).click();
-  // await page.getByRole('button', { name: 'Delete Windrows'}).first().click();
-  // await page.getByRole('button', { name: 'No' }).click();
-  // // await page.getByRole('row', { name: 'Along Inside Runway Edge - 30 FT to the NORTH 2 FT 2 IN' }).getByRole('rowheader', { name: 'Along Inside Runway Edge - 30 FT to the NORTH' }).click();
-  // await page.getByRole('button', { name: 'Delete Windrows'}).first().click();
-  // await page.getByRole('button', { name: 'Yes' }).click();
-  // await page.getByRole('button', { name: 'Add Windrows' }).first().click();
-  // await page.getByRole('button', { name: 'Along Cleared Width' }).click();
-  // await page.getByRole('option', { name: 'Distance From Center Line' }).click();
-  // await page.getByLabel('FT', { exact: true }).fill("2");
-  // await page.getByLabel('IN', { exact: true }).fill("2");
-  // await page.getByLabel('NORTH side').click();
-  // await page.getByRole('button', { name: '​' }).nth(1).click();
-  // await page.getByRole('option', { name: '30' }).click();
-  // await page.getByLabel('SOUTH side').click();
-  // await page.getByRole('button', { name: '​' }).nth(2).click();
-  // await page.getByRole('option', { name: '30' }).click();
-  // await page.getByRole('button', { name: 'Add' }).click();
-  // await page.getByRole('row', { name: 'Distance From Center Line - 30 FT to the SOUTH 2 FT 2 IN' }).getByRole('rowheader', { name: 'Distance From Center Line - 30 FT to the SOUTH' }).click();
-  // await page.getByRole('button', { name: 'Edit Windrows' }).first().click();
-  // await page.getByRole('button', { name: 'Cancel' }).click();
-  // // await page.getByRole('row', { name: 'Distance From Center Line - 30 FT to the SOUTH 2 FT 2 IN' }).getByRole('rowheader', { name: 'Distance From Center Line - 30 FT to the SOUTH' }).click();
-  // await page.getByRole('button', { name: 'Edit Windrows' }).first().click();
-  // await page.getByLabel('FT', { exact: true }).click("3");
-  // await page.getByLabel('IN', { exact: true }).click("3");
-  // await page.getByRole('button', { name: 'Ok' }).click();
-  // // await page.getByRole('row', { name: 'Distance From Center Line - 30 FT to the SOUTH 3 FT 3 IN' }).getByRole('rowheader', { name: 'Distance From Center Line - 30 FT to the SOUTH' }).click();
-  // await page.getByRole('button', { name: 'Delete Windrows'}).first().click();
-  // await page.getByRole('button', { name: 'No' }).click();
-  // // await page.getByRole('row', { name: 'Distance From Center Line - 30 FT to the SOUTH 2 FT 2 IN' }).getByRole('rowheader', { name: 'Distance From Center Line - 30 FT to the SOUTH' }).click();
-  // await page.getByRole('button', { name: 'Delete Windrows'}).first().click();
-  // await page.getByRole('button', { name: 'Yes' }).click();
-  // await page.getByRole('button', { name: 'Add Windrows' }).first().click();
-  // await page.getByRole('button', { name: 'Along Cleared Width' }).click();
-  // await page.getByRole('option', { name: 'Distance From Threshold' }).click();
-  // await page.getByLabel('FT', { exact: true }).fill("2");
-  // await page.getByLabel('IN', { exact: true }).fill("2");
-  // await page.getByRole('button', { name: '​' }).nth(1).click();
-  // await page.getByRole('option').nth(1).click();
-  // await page.getByRole('button', { name: '​', exact: true }).click();
-  // await page.getByRole('option', { name: '700', exact: true }).click();
-  // await page.getByRole('button', { name: 'Add' }).click();
-  // await page.getByRole('rowheader', { name: 'Distance From Threshold - 700 FT from 25' }).click();
-  // await page.getByRole('button', { name: 'Edit Windrows' }).first().click();
-  // await page.getByRole('button', { name: 'Cancel' }).click();
-  // // await page.getByRole('rowheader', { name: 'Distance From Threshold - 700 FT from 25' }).click();
-  // await page.getByRole('button', { name: 'Edit Windrows' }).first().click();
-  // await page.getByLabel('FT', { exact: true }).click("3");
-  // await page.getByLabel('IN', { exact: true }).click("3");
-  // await page.getByRole('button', { name: 'Ok' }).click();
-  // // await page.getByRole('rowheader', { name: 'Distance From Threshold - 700 FT from 25' }).click();
-  // await page.getByRole('button', { name: 'Delete Windrows'}).first().click();
-  // await page.getByRole('button', { name: 'No' }).click();
-  // // await page.getByRole('rowheader', { name: 'Distance From Threshold - 700 FT from 25' }).click();
-  // await page.getByRole('button', { name: 'Delete Windrows'}).first().click();
-  // await page.getByRole('button', { name: 'Yes' }).click();
-  // await page.getByRole('button', { name: 'Add Windrows' }).first().click();
-  // await page.getByRole('button', { name: 'Along Cleared Width' }).click();
-  // await page.getByRole('option', { name: 'Across Intersection From Runway' }).click();
-  // await page.getByLabel('FT', { exact: true }).fill("2");
-  // await page.getByLabel('IN', { exact: true }).fill("2");
-  // await page.getByRole('button', { name: '​' }).nth(1).click();
-  // await page.getByRole('option').nth(1).click();
-  // await page.getByRole('button', { name: 'Add' }).click();
-  // await page.getByRole('rowheader', { name: 'Across Intersection From Runway: 04/22' }).click();
-  // await page.getByRole('button', { name: 'Edit Windrows' }).first().click();
-  // await page.getByRole('button', { name: 'Cancel' }).click();
-  // // await page.getByRole('rowheader', { name: 'Across Intersection From Runway: 04/22' }).click();
-  // await page.getByRole('button', { name: 'Edit Windrows' }).first().click();
-  // await page.getByLabel('FT', { exact: true }).click("3");
-  // await page.getByLabel('IN', { exact: true }).click("3");
-  // await page.getByRole('button', { name: 'Ok' }).click();
-  // // await page.getByRole('rowheader', { name: 'Across Intersection From Runway: 04/22' }).click();
-  // await page.getByRole('button', { name: 'Delete Windrows'}).first().click();
-  // await page.getByRole('button', { name: 'No' }).click();
-  // // await page.getByRole('rowheader', { name: 'Across Intersection From Runway: 04/22' }).click();
-  // await page.getByRole('button', { name: 'Delete Windrows'}).first().click();
-  // await page.getByRole('button', { name: 'Yes' }).click();
-  // await page.getByRole('tab', { name: 'Snowdrifts' }).click();
-  // await page.getByRole('button', { name: 'Add Snowdrifts' }).first().click();
-  // await page.getByRole('button', { name: 'Cancel' }).click();
-  // await page.getByRole('button', { name: 'Add Snowdrifts' }).first().click();
-  // await page.getByRole('button', { name: 'Along Cleared Width' }).click();
-  // await page.getByRole('option', { name: 'Along Cleared Width' }).click();
-  // await page.getByLabel('FT', { exact: true }).fill("2");
-  // await page.getByLabel('IN', { exact: true }).fill("2");
-  // await page.getByRole('button', { name: 'Add' }).click();
-  // await page.getByRole('row', { name: 'Along Cleared Width 2 FT 2 IN' }).getByRole('rowheader', { name: 'Along Cleared Width' }).click();
-  // await page.getByRole('button', { name: 'Edit Snowdrifts' }).first().click();
-  // await page.getByRole('button', { name: 'Cancel' }).click();
-  // await page.getByRole('row', { name: 'Along Cleared Width 2 FT 2 IN' }).getByRole('rowheader', { name: 'Along Cleared Width' }).click();
-  // await page.getByRole('button', { name: 'Edit Snowdrifts' }).first().click();
-  // await page.getByLabel('FT', { exact: true }).fill("3");
-  // await page.getByLabel('IN', { exact: true }).fill("3");
-  // await page.getByRole('button', { name: 'Ok' }).click();
-  // await page.getByRole('row', { name: 'Along Cleared Width 3 FT 3 IN' }).getByRole('rowheader', { name: 'Along Cleared Width' }).click();
-  // await page.getByRole('button', { name: 'Delete Snowdrifts'}).first().click();
-  // await page.getByRole('button', { name: 'No' }).click();
-  // await page.getByRole('row', { name: 'Along Cleared Width 3 FT 3 IN' }).getByRole('rowheader', { name: 'Along Cleared Width' }).click();
-  // await page.getByRole('button', { name: 'Delete Snowdrifts'}).first().click();
-  // await page.getByRole('button', { name: 'Yes' }).click();
-  // await page.getByRole('button', { name: 'Add Snowdrifts' }).first().click();
-  // await page.getByRole('button', { name: 'Along Cleared Width' }).click();
-  // await page.getByRole('option', { name: 'Along Inside Runway Edge' }).click();
-  // await page.getByLabel('FT', { exact: true }).fill("2");
-  // await page.getByLabel('IN', { exact: true }).fill("2");
-  // await page.getByLabel('NORTH side').click();
-  // await page.getByRole('button', { name: '​' }).nth(1).click();
-  // await page.getByRole('option', { name: '30' }).click();
-  // await page.getByLabel('SOUTH side').click();
-  // await page.getByRole('button', { name: '​' }).nth(2).click();
-  // await page.getByRole('option', { name: '30' }).click();
-  // await page.getByRole('button', { name: 'Add' }).click();
-  // await page.getByRole('row', { name: 'Along Inside Runway Edge - 30 FT to the NORTH 2 FT 2 IN' }).getByRole('rowheader', { name: 'Along Inside Runway Edge - 30 FT to the NORTH' }).click();
-  // await page.getByRole('button', { name: 'Edit Snowdrifts' }).first().click();
-  // await page.getByRole('button', { name: 'Cancel' }).click();
-  // // await page.getByRole('row', { name: 'Along Inside Runway Edge - 30 FT to the NORTH 2 FT 2 IN' }).getByRole('rowheader', { name: 'Along Inside Runway Edge - 30 FT to the NORTH' }).click();
-  // await page.getByRole('button', { name: 'Edit Snowdrifts' }).first().click();
-  // await page.getByLabel('FT', { exact: true }).click("3");
-  // await page.getByLabel('IN', { exact: true }).click("3");
-  // await page.getByRole('button', { name: 'Ok' }).click();
-  // // await page.getByRole('row', { name: 'Along Inside Runway Edge - 30 FT to the NORTH 3 FT 3 IN' }).getByRole('rowheader', { name: 'Along Inside Runway Edge - 30 FT to the NORTH' }).click();
-  // await page.getByRole('button', { name: 'Delete Snowdrifts'}).first().click();
-  // await page.getByRole('button', { name: 'No' }).click();
-  // // await page.getByRole('row', { name: 'Along Inside Runway Edge - 30 FT to the NORTH 2 FT 2 IN' }).getByRole('rowheader', { name: 'Along Inside Runway Edge - 30 FT to the NORTH' }).click();
-  // await page.getByRole('button', { name: 'Delete Snowdrifts'}).first().click();
-  // await page.getByRole('button', { name: 'Yes' }).click();
-  // await page.getByRole('button', { name: 'Add Windrows' }).first().click();
-  // await page.getByRole('button', { name: 'Along Cleared Width' }).click();
-  // await page.getByRole('option', { name: 'Distance From Center Line' }).click();
-  // await page.getByLabel('FT', { exact: true }).fill("2");
-  // await page.getByLabel('IN', { exact: true }).fill("2");
-  // await page.getByLabel('NORTH side').click();
-  // await page.getByRole('button', { name: '​' }).nth(1).click();
-  // await page.getByRole('option', { name: '30' }).click();
-  // await page.getByLabel('SOUTH side').click();
-  // await page.getByRole('button', { name: '​' }).nth(2).click();
-  // await page.getByRole('option', { name: '30' }).click();
-  // await page.getByRole('button', { name: 'Add' }).click();
-  // await page.getByRole('row', { name: 'Distance From Center Line - 30 FT to the SOUTH 2 FT 2 IN' }).getByRole('rowheader', { name: 'Distance From Center Line - 30 FT to the SOUTH' }).click();
-  // await page.getByRole('button', { name: 'Edit Snowdrifts' }).first().click();
-  // await page.getByRole('button', { name: 'Cancel' }).click();
-  // // await page.getByRole('row', { name: 'Distance From Center Line - 30 FT to the SOUTH 2 FT 2 IN' }).getByRole('rowheader', { name: 'Distance From Center Line - 30 FT to the SOUTH' }).click();
-  // await page.getByRole('button', { name: 'Edit Snowdrifts' }).first().click();
-  // await page.getByLabel('FT', { exact: true }).click("3");
-  // await page.getByLabel('IN', { exact: true }).click("3");
-  // await page.getByRole('button', { name: 'Ok' }).click();
-  // // await page.getByRole('row', { name: 'Distance From Center Line - 30 FT to the SOUTH 3 FT 3 IN' }).getByRole('rowheader', { name: 'Distance From Center Line - 30 FT to the SOUTH' }).click();
-  // await page.getByRole('button', { name: 'Delete Snowdrifts'}).first().click();
-  // await page.getByRole('button', { name: 'No' }).click();
-  // // await page.getByRole('row', { name: 'Distance From Center Line - 30 FT to the SOUTH 2 FT 2 IN' }).getByRole('rowheader', { name: 'Distance From Center Line - 30 FT to the SOUTH' }).click();
-  // await page.getByRole('button', { name: 'Delete Snowdrifts'}).first().click();
-  // await page.getByRole('button', { name: 'Yes' }).click();
-  // await page.getByRole('button', { name: 'Add Snowdrifts' }).first().click();
-  // await page.getByRole('button', { name: 'Along Cleared Width' }).click();
-  // await page.getByRole('option', { name: 'Distance From Threshold' }).click();
-  // await page.getByLabel('FT', { exact: true }).fill("2");
-  // await page.getByLabel('IN', { exact: true }).fill("2");
-  // await page.getByRole('button', { name: '​' }).nth(1).click();
-  // await page.getByRole('option').nth(1).click();
-  // await page.getByRole('button', { name: '​', exact: true }).click();
-  // await page.getByRole('option', { name: '700', exact: true }).click();
-  // await page.getByRole('button', { name: 'Add' }).click();
-  // await page.getByRole('rowheader', { name: 'Distance From Threshold - 700 FT from 25' }).click();
-  // await page.getByRole('button', { name: 'Edit Snowdrifts' }).first().click();
-  // await page.getByRole('button', { name: 'Cancel' }).click();
-  // // await page.getByRole('rowheader', { name: 'Distance From Threshold - 700 FT from 25' }).click();
-  // await page.getByRole('button', { name: 'Edit Snowdrifts' }).first().click();
-  // await page.getByLabel('FT', { exact: true }).click("3");
-  // await page.getByLabel('IN', { exact: true }).click("3");
-  // await page.getByRole('button', { name: 'Ok' }).click();
-  // // await page.getByRole('rowheader', { name: 'Distance From Threshold - 700 FT from 25' }).click();
-  // await page.getByRole('button', { name: 'Delete Snowdrifts'}).first().click();
-  // await page.getByRole('button', { name: 'No' }).click();
-  // // await page.getByRole('rowheader', { name: 'Distance From Threshold - 700 FT from 25' }).click();
-  // await page.getByRole('button', { name: 'Delete Snowdrifts'}).first().click();
-  // await page.getByRole('button', { name: 'Yes' }).click();
-  // await page.getByRole('button', { name: 'Add Snowdrifts' }).first().click();
-  // await page.getByRole('button', { name: 'Along Cleared Width' }).click();
-  // await page.getByRole('option', { name: 'Across Intersection From Runway' }).click();
-  // await page.getByLabel('FT', { exact: true }).fill("2");
-  // await page.getByLabel('IN', { exact: true }).fill("2");
-  // await page.getByRole('button', { name: '​' }).nth(1).click();
-  // await page.getByRole('option').nth(1).click();
-  // await page.getByRole('button', { name: 'Add' }).click();
-  // await page.getByRole('rowheader', { name: 'Across Intersection From Runway: 04/22' }).click();
-  // await page.getByRole('button', { name: 'Edit Snowdrifts' }).first().click();
-  // await page.getByRole('button', { name: 'Cancel' }).click();
-  // // await page.getByRole('rowheader', { name: 'Across Intersection From Runway: 04/22' }).click();
-  // await page.getByRole('button', { name: 'Edit Snowdrifts' }).first().click();
-  // await page.getByLabel('FT', { exact: true }).click("3");
-  // await page.getByLabel('IN', { exact: true }).click("3");
-  // await page.getByRole('button', { name: 'Ok' }).click();
-  // // await page.getByRole('rowheader', { name: 'Across Intersection From Runway: 04/22' }).click();
-  // await page.getByRole('button', { name: 'Delete Snowdrifts'}).first().click();
-  // await page.getByRole('button', { name: 'No' }).click();
-  // // await page.getByRole('rowheader', { name: 'Across Intersection From Runway: 04/22' }).click();
-  // await page.getByRole('button', { name: 'Delete Snowdrifts'}).first().click();
-  // await page.getByRole('button', { name: 'Yes' }).click();
+export async function deletetab(page, type, input) {
+  await page.getByRole('button', { name: type }).first().click();
+  await page.getByRole('button', { name: input }).click();
 }
 
+export async function edittab(page, type, heightft, heightin, input) {
+  await page.getByRole('button', { name: type }).first().click();
+  await page.getByLabel('FT', { exact: true }).fill(heightft);
+  await page.getByLabel('IN', { exact: true }).fill(heightin);
+  await page.getByRole('button', { name: input }).click();
+}
 
+export async function addTab(page, type, option, heightft, heightin, input) {
+  await page.getByRole('button', { name: type }).first().click();
+  await page.getByRole('button', { name: 'Along Cleared Width' }).click();
+  if(option == "Along Cleared Width") {
+    await page.getByRole('option', { name: option }).click();
+  }
+  else if(option == "Along Inside Runway Edge"){
+    await page.getByRole('option', { name: option }).click();
+    await page.getByLabel('NORTHEAST side').click();
+    await page.getByRole('button', { name: '​' }).nth(1).click();
+    await page.getByRole('option', { name: '30' }).click();
+    await page.getByLabel('SOUTHWEST side').click();
+    await page.getByRole('button', { name: '​' }).nth(2).click();
+    await page.getByRole('option', { name: '30' }).click();
+  }
+  else if(option == "Distance From Center Line"){
+    await page.getByRole('option', { name: option }).click();
+    await page.getByLabel('NORTHEAST side').click();
+    await page.getByRole('button', { name: '​' }).nth(1).click();
+    await page.getByRole('option', { name: '30' }).click();
+    await page.getByLabel('SOUTHWEST side').click();
+    await page.getByRole('button', { name: '​' }).nth(2).click();
+    await page.getByRole('option', { name: '30' }).click();
+  }
+  else if(option == "Distance From Threshold"){
+    await page.getByRole('option', { name: option }).click();
+    await page.getByRole('button', { name: '​' }).nth(1).click();
+    await page.getByRole('option').nth(1).click();
+    await page.getByRole('button', { name: '​' }).nth(2).click();
+    await page.getByRole('option', { name: '700', exact: true }).click();
+  }
+  else if(option == "Across Intersection From Runway"){
+    await page.getByRole('option', { name: option }).click();
+    await page.getByRole('button', { name: '​' }).nth(1).click();
+    await page.getByRole('option').nth(1).click();
+  }
+  await page.getByLabel('FT', { exact: true }).fill(heightft);
+  await page.getByLabel('IN', { exact: true }).fill(heightin);
+  await page.getByRole('button', { name: input }).click();
+}
+
+export async function conditionsOnRunway(page) {
+  await addTab(page, "Add Snowbank", "Along Cleared Width", "2", "2", "Cancel");
+  await addTab(page, "Add Snowbank", "Along Cleared Width", "2", "2", "Add");
+  await page.getByRole('row', { name: 'Along Cleared Width 2 FT 2 IN' }).getByRole('rowheader', { name: 'Along Cleared Width' }).click();
+  await edittab(page, "Edit Snowbank", "3", "3", "Cancel");
+  await page.getByRole('row', { name: 'Along Cleared Width 2 FT 2 IN' }).getByRole('rowheader', { name: 'Along Cleared Width' }).click();
+  await edittab(page, "Edit Snowbank", "3", "3", "Ok");
+  await page.getByRole('row', { name: 'Along Cleared Width 3 FT 3 IN' }).getByRole('rowheader', { name: 'Along Cleared Width' }).click();
+  await deletetab(page, "Delete Snowbank", "No");
+  await page.getByRole('row', { name: 'Along Cleared Width 3 FT 3 IN' }).getByRole('rowheader', { name: 'Along Cleared Width' }).click();
+  await deletetab(page, "Delete Snowbank", "Yes");
+  await addTab(page, "Add Snowbank", "Along Inside Runway Edge", "2", "2", "Cancel");
+  await addTab(page, "Add Snowbank", "Along Inside Runway Edge", "2", "2", "Add");
+  await page.getByRole('row', { name: 'Along Inside Runway Edge - 30 FT to the NORTHEAST 2 FT 2 IN' }).getByRole('rowheader', { name: 'Along Inside Runway Edge - 30 FT to the NORTHEAST' }).click();
+  await edittab(page, "Edit Snowbank", "3", "3", "Cancel");
+  // await page.getByRole('row', { name: 'Along Inside Runway Edge - 30 FT to the NORTHEAST 2 FT 2 IN' }).getByRole('rowheader', { name: 'Along Inside Runway Edge - 30 FT to the NORTHEAST' }).click();
+  await edittab(page, "Edit Snowbank", "3", "3", "Ok");
+  // await page.getByRole('row', { name: 'Along Inside Runway Edge - 30 FT to the NORTHEAST 3 FT 3 IN' }).getByRole('rowheader', { name: 'Along Inside Runway Edge - 30 FT to the NORTHEAST' }).click();
+  await deletetab(page, "Delete Snowbank", "No");
+  // await page.getByRole('row', { name: 'Along Inside Runway Edge - 30 FT to the NORTHEAST 2 FT 2 IN' }).getByRole('rowheader', { name: 'Along Inside Runway Edge - 30 FT to the NORTHEAST' }).click();
+  await deletetab(page, "Delete Snowbank", "Yes");
+  await addTab(page, "Add Snowbank", "Distance From Center Line", "2", "2", "Cancel");
+  await addTab(page, "Add Snowbank", "Distance From Center Line", "2", "2", "Add");
+  await page.getByRole('row', { name: 'Distance From Center Line - 30 FT to the SOUTHWEST 2 FT 2 IN' }).getByRole('rowheader', { name: 'Distance From Center Line - 30 FT to the SOUTHWEST' }).click();
+  await edittab(page, "Edit Snowbank", "3", "3", "Cancel");
+  // await page.getByRole('row', { name: 'Distance From Center Line - 30 FT to the SOUTHWEST 2 FT 2 IN' }).getByRole('rowheader', { name: 'Distance From Center Line - 30 FT to the SOUTHWEST' }).click();
+  await edittab(page, "Edit Snowbank", "3", "3", "Ok");
+  // await page.getByRole('row', { name: 'Distance From Center Line - 30 FT to the SOUTHWEST 3 FT 3 IN' }).getByRole('rowheader', { name: 'Distance From Center Line - 30 FT to the SOUTHWEST' }).click();
+  await deletetab(page, "Delete Snowbank", "No");
+  // await page.getByRole('row', { name: 'Distance From Center Line - 30 FT to the SOUTHWEST 2 FT 2 IN' }).getByRole('rowheader', { name: 'Distance From Center Line - 30 FT to the SOUTHWEST' }).click();
+  await deletetab(page, "Delete Snowbank", "Yes");
+  await addTab(page, "Add Snowbank", "Distance From Threshold", "2", "2", "Cancel");
+  await addTab(page, "Add Snowbank", "Distance From Threshold", "2", "2", "Add");
+  await page.getByRole('rowheader', { name: 'Distance From Threshold - 700 FT from 32' }).click();
+  await edittab(page, "Edit Snowbank", "3", "3", "Cancel");
+  // await page.getByRole('rowheader', { name: 'Distance From Threshold - 700 FT from 32' }).click();
+  await edittab(page, "Edit Snowbank", "3", "3", "OK");
+  // await page.getByRole('rowheader', { name: 'Distance From Threshold - 700 FT from 32' }).click();
+  await deletetab(page, "Delete Snowbank", "No");
+  // await page.getByRole('rowheader', { name: 'Distance From Threshold - 700 FT from 32' }).click();
+  await deletetab(page, "Delete Snowbank", "Yes");
+  await addTab(page, "Add Snowbank", "Across Intersection From Runway", "2", "2", "Cancel");
+  await addTab(page, "Add Snowbank", "Across Intersection From Runway", "2", "2", "Add");
+  await page.getByRole('rowheader', { name: 'Across Intersection From Runway: 04/22' }).click();
+  await edittab(page, "Edit Snowbank", "3", "3", "Cancel");
+  // await page.getByRole('rowheader', { name: 'Across Intersection From Runway: 04/22' }).click();
+  await edittab(page, "Edit Snowbank", "3", "3", "Ok");
+  // await page.getByRole('rowheader', { name: 'Across Intersection From Runway: 04/22' }).click();
+  await deletetab(page, "Delete Snowbank", "No");
+  // await page.getByRole('rowheader', { name: 'Across Intersection From Runway: 04/22' }).click();
+  await deletetab(page, "Delete Snowbank", "Yes");
+
+  // await page.getByRole('tab', { name: 'Windrows' }).click();
+  // await addTab(page, "Add Windrows", "Along Cleared Width", "2", "2", "Cancel");
+  // await addTab(page, "Add Windrows", "Along Cleared Width", "2", "2", "Add");
+  // await page.getByRole('row', { name: 'Along Cleared Width 2 FT 2 IN' }).getByRole('rowheader', { name: 'Along Cleared Width' }).click();
+  // await edittab(page, "Edit Windrows", "3", "3", "Cancel");
+  // await page.getByRole('row', { name: 'Along Cleared Width 2 FT 2 IN' }).getByRole('rowheader', { name: 'Along Cleared Width' }).click();
+  // await page.getByRole('button', { name: 'Edit Windrows' }).first().click();
+  // await edittab(page, "Edit Windrows", "3", "3", "Ok");
+  // await page.getByRole('row', { name: 'Along Cleared Width 3 FT 3 IN' }).getByRole('rowheader', { name: 'Along Cleared Width' }).click();
+  // await deletetab(page, "Delete Windrows", "No");
+  // await page.getByRole('row', { name: 'Along Cleared Width 3 FT 3 IN' }).getByRole('rowheader', { name: 'Along Cleared Width' }).click();
+  // await deletetab(page, "Delete Windrows", "Yes");
+  // await addTab(page, "Add Windrows", "Along Inside Runway Edge", "2", "2", "Cancel");
+  // await addTab(page, "Add Windrows", "Along Inside Runway Edge", "2", "2", "Add");
+  // await page.getByRole('row', { name: 'Along Inside Runway Edge - 30 FT to the NORTHEAST 2 FT 2 IN' }).getByRole('rowheader', { name: 'Along Inside Runway Edge - 30 FT to the NORTHEAST' }).click();
+  // await edittab(page, "Edit Windrows", "3", "3", "Cancel");
+  // // await page.getByRole('row', { name: 'Along Inside Runway Edge - 30 FT to the NORTHEAST 2 FT 2 IN' }).getByRole('rowheader', { name: 'Along Inside Runway Edge - 30 FT to the NORTHEAST' }).click();
+  // await edittab(page, "Edit Windrows", "3", "3", "Ok");
+  // // await page.getByRole('row', { name: 'Along Inside Runway Edge - 30 FT to the NORTHEAST 3 FT 3 IN' }).getByRole('rowheader', { name: 'Along Inside Runway Edge - 30 FT to the NORTHEAST' }).click();
+  // await deletetab(page, "Delete Windrows", "No");
+  // // await page.getByRole('row', { name: 'Along Inside Runway Edge - 30 FT to the NORTHEAST 2 FT 2 IN' }).getByRole('rowheader', { name: 'Along Inside Runway Edge - 30 FT to the NORTHEAST' }).click();
+  // await deletetab(page, "Delete Windrows", "Yes");
+  // await addTab(page, "Add Windrows", "Distance From Center Line", "2", "2", "Cancel");
+  // await addTab(page, "Add Windrows", "Distance From Center Line", "2", "2", "Add");
+  // await page.getByRole('row', { name: 'Distance From Center Line - 30 FT to the SOUTHWEST 2 FT 2 IN' }).getByRole('rowheader', { name: 'Distance From Center Line - 30 FT to the SOUTHWEST' }).click();
+  // await edittab(page, "Edit Windrows", "3", "3", "Cancel");
+  // // await page.getByRole('row', { name: 'Distance From Center Line - 30 FT to the SOUTHWEST 2 FT 2 IN' }).getByRole('rowheader', { name: 'Distance From Center Line - 30 FT to the SOUTHWEST' }).click();
+  // await edittab(page, "Edit Windrows", "3", "3", "Ok");
+  // // await page.getByRole('row', { name: 'Distance From Center Line - 30 FT to the SOUTHWEST 3 FT 3 IN' }).getByRole('rowheader', { name: 'Distance From Center Line - 30 FT to the SOUTHWEST' }).click();
+  // await deletetab(page, "Delete Windrows", "No");
+  // // await page.getByRole('row', { name: 'Distance From Center Line - 30 FT to the SOUTHWEST 2 FT 2 IN' }).getByRole('rowheader', { name: 'Distance From Center Line - 30 FT to the SOUTHWEST' }).click();
+  // await deletetab(page, "Delete Windrows", "Yes");
+  // await addTab(page, "Add Windrows", "Distance From Threshold", "2", "2", "Cancel");
+  // await addTab(page, "Add Windrows", "Distance From Threshold", "2", "2", "Add");
+  // await page.getByRole('rowheader', { name: 'Distance From Threshold - 700 FT from 32' }).click();
+  // await edittab(page, "Edit Windrows", "3", "3", "Cancel");
+  // // await page.getByRole('rowheader', { name: 'Distance From Threshold - 700 FT from 32' }).click();
+  // await edittab(page, "Edit Windrows", "3", "3", "Ok");
+  // // await page.getByRole('rowheader', { name: 'Distance From Threshold - 700 FT from 32' }).click();
+  // await deletetab(page, "Delete Windrows", "No");
+  // // await page.getByRole('rowheader', { name: 'Distance From Threshold - 700 FT from 32' }).click();
+  // await deletetab(page, "Delete Windrows", "Yes");
+  // await addTab(page, "Add Windrows", "Across Intersection From Runway", "2", "2", "Cancel");
+  // await addTab(page, "Add Windrows", "Across Intersection From Runway", "2", "2", "Add");
+  // await page.getByRole('rowheader', { name: 'Across Intersection From Runway: 04/22' }).click();
+  // await edittab(page, "Edit Windrows", "3", "3", "Cancel");
+  // // await page.getByRole('rowheader', { name: 'Across Intersection From Runway: 04/22' }).click();
+  // await edittab(page, "Edit Windrows", "3", "3", "Ok");
+  // // await page.getByRole('rowheader', { name: 'Across Intersection From Runway: 04/22' }).click();
+  // await deletetab(page, "Delete Windrows", "No");
+  // // await page.getByRole('rowheader', { name: 'Across Intersection From Runway: 04/22' }).click();
+  // await deletetab(page, "Delete Windrows", "Yes");
+
+  // await page.getByRole('tab', { name: 'Snowdrifts' }).click();
+  // await addTab(page, "Add Snowdrifts", "Along Cleared Width", "2", "2", "Cancel");
+  // await addTab(page, "Add Snowdrifts", "Along Cleared Width", "2", "2", "Add");
+  // await page.getByRole('row', { name: 'Along Cleared Width 2 FT 2 IN' }).getByRole('rowheader', { name: 'Along Cleared Width' }).click();
+  // await edittab(page, "Edit Snowdrifts", "3", "3", "Cancel");
+  // await page.getByRole('row', { name: 'Along Cleared Width 2 FT 2 IN' }).getByRole('rowheader', { name: 'Along Cleared Width' }).click();
+  // await edittab(page, "Edit Snowdrifts", "3", "3", "Ok");
+  // await page.getByRole('row', { name: 'Along Cleared Width 3 FT 3 IN' }).getByRole('rowheader', { name: 'Along Cleared Width' }).click();
+  // await deletetab(page, "Delete Snowdrifts", "No");
+  // await page.getByRole('row', { name: 'Along Cleared Width 3 FT 3 IN' }).getByRole('rowheader', { name: 'Along Cleared Width' }).click();
+  // await deletetab(page, "Delete Snowdrifts", "Yes");
+  // await addTab(page, "Add Snowdrifts", "Along Inside Runway Edge", "2", "2", "Cancel");
+  // await addTab(page, "Add Snowdrifts", "Along Inside Runway Edge", "2", "2", "Add");
+  // await page.getByRole('row', { name: 'Along Inside Runway Edge - 30 FT to the NORTHEAST 2 FT 2 IN' }).getByRole('rowheader', { name: 'Along Inside Runway Edge - 30 FT to the NORTHEAST' }).click();
+  // await edittab(page, "Edit Snowdrifts", "3", "3", "Cancel");
+  // // await page.getByRole('row', { name: 'Along Inside Runway Edge - 30 FT to the NORTHEAST 2 FT 2 IN' }).getByRole('rowheader', { name: 'Along Inside Runway Edge - 30 FT to the NORTHEAST' }).click();
+  // await edittab(page, "Edit Snowdrifts", "3", "3", "Ok");
+  // // await page.getByRole('row', { name: 'Along Inside Runway Edge - 30 FT to the NORTHEAST 3 FT 3 IN' }).getByRole('rowheader', { name: 'Along Inside Runway Edge - 30 FT to the NORTHEAST' }).click();
+  // await deletetab(page, "Delete Snowdrifts", "Yes");
+  // // await page.getByRole('row', { name: 'Along Inside Runway Edge - 30 FT to the NORTHEAST 2 FT 2 IN' }).getByRole('rowheader', { name: 'Along Inside Runway Edge - 30 FT to the NORTHEAST' }).click();
+  // await deletetab(page, "Delete Snowdrifts", "No");
+  // await addTab(page, "Add Snowdrifts", "Distance From Center Line", "2", "2", "Cancel");
+  // await addTab(page, "Add Snowdrifts", "Distance From Center Line", "2", "2", "Add");
+  // await page.getByRole('row', { name: 'Distance From Center Line - 30 FT to the SOUTHWEST 2 FT 2 IN' }).getByRole('rowheader', { name: 'Distance From Center Line - 30 FT to the SOUTHWEST' }).click();
+  // await edittab(page, "Edit Snowdrifts", "3", "3", "Cancel");
+  // // await page.getByRole('row', { name: 'Distance From Center Line - 30 FT to the SOUTHWEST 2 FT 2 IN' }).getByRole('rowheader', { name: 'Distance From Center Line - 30 FT to the SOUTHWEST' }).click();
+  // await edittab(page, "Edit Snowdrifts", "3", "3", "Ok");
+  // // await page.getByRole('row', { name: 'Distance From Center Line - 30 FT to the SOUTHWEST 3 FT 3 IN' }).getByRole('rowheader', { name: 'Distance From Center Line - 30 FT to the SOUTHWEST' }).click();
+  // await deletetab(page, "Delete Snowdrifts", "No");
+  // // await page.getByRole('row', { name: 'Distance From Center Line - 30 FT to the SOUTHWEST 2 FT 2 IN' }).getByRole('rowheader', { name: 'Distance From Center Line - 30 FT to the SOUTHWEST' }).click();
+  // await deletetab(page, "Delete Snowdrifts", "Yes");
+  // await addTab(page, "Add Snowdrifts", "Distance From Threshold", "2", "2", "Cancel");
+  // await addTab(page, "Add Snowdrifts", "Distance From Threshold", "2", "2", "Add");
+  // await page.getByRole('rowheader', { name: 'Distance From Threshold - 700 FT from 32' }).click();
+  // await edittab(page, "Edit Snowdrifts", "3", "3", "Cancel");
+  // // await page.getByRole('rowheader', { name: 'Distance From Threshold - 700 FT from 32' }).click();
+  // await edittab(page, "Edit Snowdrifts", "3", "3", "Ok");
+  // // await page.getByRole('rowheader', { name: 'Distance From Threshold - 700 FT from 32' }).click();
+  // await deletetab(page, "Delete Snowdrifts", "No");
+  // // await page.getByRole('rowheader', { name: 'Distance From Threshold - 700 FT from 32' }).click();
+  // await deletetab(page, "Delete Snowdrifts", "Yes");
+  // await addTab(page, "Add Snowdrifts", "Across Intersection From Runway", "2", "2", "Cancel");
+  // await addTab(page, "Add Snowdrifts", "Across Intersection From Runway", "2", "2", "Add");
+  // await page.getByRole('rowheader', { name: 'Across Intersection From Runway: 04/22' }).click();
+  // await edittab(page, "Edit Snowdrifts", "3", "3", "Cancel");
+  // // await page.getByRole('rowheader', { name: 'Across Intersection From Runway: 04/22' }).click();
+  // await edittab(page, "Edit Snowdrifts", "3", "3", "Ok");
+  // // await page.getByRole('rowheader', { name: 'Across Intersection From Runway: 04/22' }).click();
+  // await deletetab(page, "Delete Snowdrifts", "No");
+  // // await page.getByRole('rowheader', { name: 'Across Intersection From Runway: 04/22' }).click();
+  // await deletetab(page, "Delete Snowdrifts", "Yes");
+}
+
+export async function performAction(page, elementIndex, buttonName) {
+  const inputElements = page.locator('.MuiInputBase-input.MuiOutlinedInput-input.Mui-readOnly');
+  const firstInputElement = inputElements.nth(elementIndex);
+  await firstInputElement.click();
+  await page.getByRole("button", { name: buttonName }).click();
+}
+
+export async function performActionplus(page, elementIndex, buttonName) {
+  const inputElements = page.locator('.MuiInputBase-input.MuiOutlinedInput-input.Mui-readOnly');
+  const firstInputElement = elementIndex === 0 ? inputElements.first() : inputElements.nth(1);
+  await firstInputElement.click();
+  await page.getByRole('button', { name: 'calendar view is open, go to text input view' }).click();
+  await page.getByRole("button", { name: buttonName }).click();
+}
+
+export async function updateTimeforSnowbank(page, elementIndex) {
+  const inputElements = page.locator('.MuiInputBase-input.MuiOutlinedInput-input.Mui-readOnly');
+  const firstInputElement = elementIndex === 0 ? inputElements.first() : inputElements.nth(1);
+  await firstInputElement.click();
+
+  const inputFieldSelector = 'input[placeholder="mmmm dd, yyyy    hh:mm"]';
+
+  // Click the input field to select the value
+  await page.click(inputFieldSelector);
+
+  // Get the value of the input field
+  let fieldValue = await page.inputValue(inputFieldSelector);
+  console.log("Field value:", fieldValue);
+
+  // Extract the date and hour from the field value
+  const [date, time] = fieldValue.split("    ");
+  const [month, day, year] = date.split(" ");
+  const [hour, minute] = time.split(":");
+
+  // Increment the hour by 1, considering the condition
+  let updatedHour;
+  let updatedDay;
+  if (parseInt(hour) === 23) {
+    updatedHour = "00";
+    updatedDay = parseInt(day) + 1;
+  } else {
+    updatedHour = (parseInt(hour) + 1).toString().padStart(2, "0");
+    updatedDay = day;
+  }
+
+  // Update the field value with the modified hour and day
+  const updatedFieldValue = `${month} ${updatedDay}, ${year}    ${updatedHour}:${minute}`;
+  console.log("Updated field value:", updatedFieldValue);
+
+  // Update the input field with the modified value
+  await page.fill(inputFieldSelector, updatedFieldValue);
+
+  // Click OK
+  await page.getByRole("button", { name: "OK" }).click();
+}
 
 
 export async function remarksSection(page) {
@@ -563,134 +479,36 @@ export async function remarksSection(page) {
   
   await page.getByLabel('Clearing/Sweeping In Progress').click();
   await page.getByLabel('Conditions Changing Rapidly').click();
+  
   await page.getByLabel('Expected To Be Cleared By').click();
-  const inputElements8 = page.locator('.MuiInputBase-input.MuiOutlinedInput-input.Mui-readOnly');
-  const firstInputElement8 = inputElements8.first();
-  await firstInputElement8.click();
-  await page.getByRole("button", { name: "OK" }).click();
+  
+  await performAction(page, 0, "OK");
+  await performAction(page, 0, "Cancel");
 
-  const inputElements9 = page.locator('.MuiInputBase-input.MuiOutlinedInput-input.Mui-readOnly');
-  const firstInputElement9 = inputElements9.first();
-  await firstInputElement9.click();
-  await page.getByRole("button", { name: "Cancel" }).click();
+  await performActionplus(page, 0, "Cancel")
+  await updateTimeforSnowbank(page, 0);
 
-  const inputElements10 = page.locator('.MuiInputBase-input.MuiOutlinedInput-input.Mui-readOnly');
-  const firstInputElement10 = inputElements10.first();
-  await firstInputElement10.click();
-  await page.getByRole('button', { name: 'calendar view is open, go to text input view' }).click();
-  await page.getByRole("button", { name: "Cancel" }).click();
-
-  const inputElements11 = page.locator('.MuiInputBase-input.MuiOutlinedInput-input.Mui-readOnly');
-  const firstInputElement11 = inputElements11.first();
-  await firstInputElement11.click();
-  await page.click('input[placeholder="mmmm dd, yyyy    hh:mm"]');
-
-  // Click the input field to select the value
-  await page.click('input[placeholder="mmmm dd, yyyy    hh:mm"]');
-
-  // Get the value of the input field
-  let fieldValue5 = await page.inputValue('input[placeholder="mmmm dd, yyyy    hh:mm"]');
-  console.log("Field value:", fieldValue5);
-
-  // Extract the date and hour from the field value
-  const [date5, time5] = fieldValue5.split("    ");
-  const [month5, day5, year5] = date5.split(" ");
-  const [hour5, minute5] = time5.split(":");
-
-  // Increment the hour by 1, considering the condition
-  let updatedHour5;
-  let updatedDay5;
-  if (parseInt(hour5) === 23) {
-  updatedHour5 = "00";
-  updatedDay5 = parseInt(day5) + 1;
-  } else {
-  updatedHour5 = (parseInt(hour5) + 1).toString().padStart(2, "0");
-  updatedDay5 = day5;
-  }
-
-  // Update the field value with the modified hour and day
-  const updatedFieldValue5 = `${month5} ${updatedDay5}, ${year5}    ${updatedHour5}:${minute5}`;
-  console.log("Updated field value:", updatedFieldValue5);
-
-  // Update the input field with the modified value
-  await page.fill('input[placeholder="mmmm dd, yyyy    hh:mm"]', updatedFieldValue5);
-
-  // Click OK
-  await page.getByRole("button", { name: "OK" }).click();
   await page.getByLabel('Next Observation At').click();
-  const inputElements12 = page.locator('.MuiInputBase-input.MuiOutlinedInput-input.Mui-readOnly');
-  const firstInputElement12 = inputElements12.nth(1);
-  await firstInputElement12.click();
-  await page.getByRole("button", { name: "OK" }).click();
+  
+  await performAction(page, 1, "OK");
+  await performAction(page, 1, "Cancel");
+  
+  await performActionplus(page, 1, "Cancel")
+  await updateTimeforSnowbank(page, 1)
 
-  const inputElements13 = page.locator('.MuiInputBase-input.MuiOutlinedInput-input.Mui-readOnly');
-  const firstInputElement13 = inputElements13.nth(1);
-  await firstInputElement13.click();
-  await page.getByRole("button", { name: "Cancel" }).click();
-
-  const inputElements14 = page.locator('.MuiInputBase-input.MuiOutlinedInput-input.Mui-readOnly');
-  const firstInputElement14 = inputElements14.nth(1);
-  await firstInputElement14.click();
-  await page.getByRole('button', { name: 'calendar view is open, go to text input view' }).click();
-  await page.getByRole("button", { name: "Cancel" }).click();
-
-  const inputElements15 = page.locator('.MuiInputBase-input.MuiOutlinedInput-input.Mui-readOnly');
-  const firstInputElement15 = inputElements15.nth(1);
-  await firstInputElement15.click();
-  await page.click('input[placeholder="mmmm dd, yyyy    hh:mm"]');
-
-  // Click the input field to select the value
-  await page.click('input[placeholder="mmmm dd, yyyy    hh:mm"]');
-
-  // Get the value of the input field
-  let fieldValue4 = await page.inputValue('input[placeholder="mmmm dd, yyyy    hh:mm"]');
-  console.log("Field value:", fieldValue4);
-
-  // Extract the date and hour from the field value
-  const [date4, time4] = fieldValue4.split("    ");
-  const [month4, day4, year4] = date4.split(" ");
-  const [hour4, minute4] = time4.split(":");
-
-  // Increment the hour by 1, considering the condition
-  let updatedHour4;
-  let updatedDay4;
-  if (parseInt(hour4) === 23) {
-  updatedHour4 = "00";
-  updatedDay4 = parseInt(day4) + 1;
-  } else {
-  updatedHour4 = (parseInt(hour4) + 1).toString().padStart(2, "0");
-  updatedDay4 = day4;
-  }
-
-  // Update the field value with the modified hour and day
-  const updatedFieldValue4 = `${month4} ${updatedDay4}, ${year4}    ${updatedHour4}:${minute4}`;
-  console.log("Updated field value:", updatedFieldValue4);
-
-  // Update the input field with the modified value
-  await page.fill('input[placeholder="mmmm dd, yyyy    hh:mm"]', updatedFieldValue4);
-
-  // Click OK
-  await page.getByRole("button", { name: "OK" }).click();
-
-  await page.getByRole('tab', { name: 'General Remarks' }).click();
-  await page.getByLabel('English Remarks').fill("a");
-  expect(await page.isVisible('label:has-text("General Remarks Contains Invalid Item \'Illegal Characters\'")'));
-  await page.getByLabel('English Remarks').fill("A");
-  await page.getByRole('tab', { name: 'Runway Remarks' }).click();
-  await page.getByLabel('English Remarks').fill("a");
-  expect(await page.isVisible('label:has-text("Runway Remarks Contains Invalid Item \'Illegal Characters\'")'));
-  await page.getByLabel('English Remarks').fill("A");
-  await page.getByRole('tab', { name: 'Taxiway Remarks' }).click();
-  await page.getByLabel('English Remarks').fill("a");
-  expect(await page.isVisible('label:has-text("Taxiway Remarks Contains Invalid Item \'Illegal Characters\'")'));
-  await page.getByLabel('English Remarks').fill("A");
-  await page.getByRole('tab', { name: 'Apron Remarks' }).click();
-  await page.getByLabel('English Remarks').fill("a");
-  expect(await page.isVisible('label:has-text("Apron Remarks Contains Invalid Item \'Illegal Characters\'")'));
-  await page.getByLabel('English Remarks').fill("A");
+  await checkRemarks(page, "General Remarks");
+  await checkRemarks(page, "Runway Remarks");
+  await checkRemarks(page, "Taxiway Remarks");
+  await checkRemarks(page, "Apron Remarks");
+  
 }
 
-
+export async function checkRemarks(page, remarktype) {
+  await page.getByRole("tab", { name: remarktype }).click();
+  await page.getByLabel('English Remarks').fill("a");
+  expect(await page.isVisible('label:has-text("${remarktype} Contains Invalid Item \'Illegal Characters\'")'));
+  await page.getByLabel('English Remarks').fill("A");
+}
 
 
 export async function runwayFriction(page) {
@@ -891,11 +709,11 @@ export async function runwayConditions(page) {
   await page.getByRole('radiogroup').filter({ hasText: 'Fully ClearedCleared Width - CenteredCleared Width (FT)Cleared Width - OffsetCle' }).getByRole('button', { name: '​' }).nth(1).click();
   await page.getByRole('option', { name: '80', exact: true }).click();
   expect(await page.isVisible('label:has-text("You Must Select An Offset Direction")'));
-  // await page.getByLabel('NORTH').click();
-  // await page.getByLabel('SOUTH').click();
+  // await page.getByLabel('NORTHEAST').click();
+  // await page.getByLabel('SOUTHWEST').click();
 
-  await page.getByRole("radio", { name: "NORTH" }).click();
-  await page.getByRole("radio", { name: "SOUTH" }).click();
+  await page.getByRole("radio", { name: "NORTHEAST" }).click();
+  await page.getByRole("radio", { name: "SOUTHWEST" }).click();
   // await page.getByRole("checkbox", { name: "Surface Packed" }).click();
   // await page.getByRole("checkbox", { name: "Surface Graded" }).click();
   // await page.getByRole("checkbox", { name: "Surface Scarified" }).click();

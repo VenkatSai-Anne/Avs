@@ -29,7 +29,7 @@ test("RSC1", async ({ page }) => {
   await performLogout(page);
 });
 
-test("RSC2", async ({ page }) => {
+test.only("RSC2", async ({ page }) => {
   await performLogin(page, credentials.email, credentials.password, true);
 
   // Select the Airport
@@ -56,6 +56,8 @@ test("RSC3", async ({ page }) => {
   await page.getByRole("button", { name: "Remarks" }).click();
   await remarksSection(page);
 
+  // Check Snowbanks Beside Runway
+  await page.getByRole("button", { name: "Snowbanks Beside Runway" }).click();
   await snowbankBesideRunway(page);
 
   // Logout
